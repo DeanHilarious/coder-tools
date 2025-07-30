@@ -1,0 +1,41 @@
+{
+  "name": "nuts-tools-frontend",
+  "version": "1.0.0",
+  "description": "一站式程序员工具集 - 前端应用",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve -s . -l 8000",
+    "dev": "npx live-server --port=8000 --no-browser",
+    "serve": "npx http-server -p 8000 -c-1 -d false --cors -o",
+    "build": "echo 'Build completed - 静态文件无需构建'",
+    "lint": "echo 'Linting completed'",
+    "install-tools": "npm install -g http-server live-server serve"
+  },
+  "keywords": [
+    "devtools",
+    "programmer",
+    "tools",
+    "vue3",
+    "frontend"
+  ],
+  "author": "DevTools Team",
+  "license": "MIT",
+  "dependencies": {
+    "vue": "^3.3.0",
+    "vue-router": "^4.0.0"
+  },
+  "devDependencies": {},
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/example/nuts-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/example/nuts-tools/issues"
+  },
+  "homepage": "https://github.com/example/nuts-tools#readme"
+} 

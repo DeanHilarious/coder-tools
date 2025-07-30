@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevTools - 程序员工具集</title>
+    <script src="https://cdn.tailwindcss.com/3.3.3"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.js"></script>
+    <style>
+        :root {
+            --primary: #165DFF;
+            --success: #36D399;
+            --warning: #FBBD23;
+            --error: #F87272;
+            --dark-bg: #1E1E2E;
+            --dark-card: #2D2D3F;
+            --light-bg: #F5F5F7;
+            --light-card: #FFFFFF;
+            --text-primary: #E2E8F0;
+            --text-secondary: #94A3B8;
+            --border-dark: #383850;
+            --border-light: #E2E8F0;
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .dark {
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+        }
+
+        .light {
+            background-color: var(--light-bg);
+            color: #2D3748;
+        }
+
+        .card {
+            background-color: var(--dark-card);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .light .card {
+            background-color: var(--light-card);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .input-field {
+            background-color: var(--dark-card);
+            border: 1px solid var(--border-dark);
+            color: var(--text-primary);
+            border-radius: 4px;
+        }
+
+        .light .input-field {
+            background-color: var(--light-card);
+            border-color: var(--border-light);
+            color: #2D3748;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .syntax-highlight {
+            border-radius: 6px;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .syntax-highlight:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .json-input {
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+            resize: vertical;
+            min-height: 200px;
+            font-size: 14px;
+        }
+
+        .json-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.2);
+        }
+
+        .message-toast {
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .flex-2 {
+            flex: 2;
+        }
+
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity 0.3s ease;
+        }
+
+        .fade-enter-from, .fade-leave-to {
+            opacity: 0;
+        }
+
+        .slide-enter-active, .slide-leave-active {
+            transition: transform 0.3s ease;
+        }
+
+        .slide-enter-from {
+            transform: translateX(100%);
+        }
+
+        .slide-leave-to {
+            transform: translateX(-100%);
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 2rem 1rem;
+            }
+            .tool-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .json-input {
+                font-size: 12px;
+                min-height: 150px;
+            }
+        }
+    </style>
+</head>
+<body class="dark">
+    <div id="app">
+        <app-layout></app-layout>
+    </div>
+
+    <script>
+      // 确保Vue和VueRouter已加载
+      if (typeof Vue === 'undefined' || typeof VueRouter === 'undefined') {
+        console.error('Vue或VueRouter未加载');
+      } else {
+        // 引入Vue的响应式API
+        const { createApp, ref, computed, onMounted, watch } = Vue;
+        const { createRouter, createWebHashHistory } = VueRouter;
+        
+        // 动态加载脚本
+        const loadScript = (src) => {
+          return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+        };
+
+        // 动态加载所有依赖
+        const loadDependencies = async () => {
+          try {
+            await loadScript('js/utils/composables.js');
+            await loadScript('js/config/tools.js');
+            await loadScript('js/shared/ToolPageBase.js');
+            await loadScript('js/shared/ToolLoader.js');
+            await loadScript('js/components/AppNavigation.js');
+            await loadScript('js/components/HomePage.js');
+            await loadScript('js/components/CategoryPage.js');
+            await loadScript('js/components/DynamicToolDetail.js');
+            await loadScript('js/components/AppLayout.js');
+            
+            // 所有依赖加载完成后初始化应用
+            initApp();
+          } catch (error) {
+            console.error('加载依赖失败:', error);
+          }
+        };
+
+        // 初始化应用
+        const initApp = () => {
+          // 路由配置
+          const routes = [
+            { path: '/', component: HomePage },
+            { path: '/tool/:id', component: DynamicToolDetail },
+            { path: '/category/:id', component: CategoryPage }
+          ];
+
+          const router = createRouter({
+            history: createWebHashHistory(),
+            routes
+          });
+
+          // 创建Vue应用
+          const app = createApp({
+            components: {
+              AppLayout
+            }
+          });
+
+          app.use(router);
+          app.mount('#app');
+
+          // 初始化主题
+          const { initTheme } = useTheme();
+          initTheme();
+        };
+
+        // 页面加载完成后开始加载依赖
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', loadDependencies);
+        } else {
+          loadDependencies();
+        }
+      }
+    </script>
+</body>
+</html> 
